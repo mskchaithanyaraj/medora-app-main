@@ -1,0 +1,228 @@
+<div class="fixed" style="top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px;" (click)="onClose()">
+  <div class="card bg-primary" style="max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-lg">
+      <h2 class="text-2xl font-bold text-dark">Create Account</h2>
+      <button (click)="onClose()" class="text-2xl cursor-pointer" style="background: none; border: none;">&times;</button>
+    </div>
+    
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">I am a</label>
+        <select 
+          class="form-select"
+          [(ngModel)]="registerData.role"
+          name="role"
+          required>
+          <option value="">Select your role</option>
+          <option value="PATIENT">Patient</option>
+          <option value="DOCTOR">Doctor</option>
+          <option value="HOSPITAL">Hospital</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          @if (registerData.role === 'HOSPITAL') {
+            Hospital Name
+          } @else {
+            Full Name
+          }
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [placeholder]="registerData.role === 'HOSPITAL' ? 'Enter hospital name' : 'Enter your full name'"
+          [(ngModel)]="registerData.fullName"
+          name="fullName"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="Choose a username"
+          [(ngModel)]="registerData.username"
+          name="username"
+          required>
+      </div>
+
+      <!-- Patient specific fields -->
+      @if (registerData.role === 'PATIENT') {
+        <div class="grid grid-cols-2 gap-md">
+          <div class="form-group">
+            <label class="form-label">Age</label>
+            <input 
+              type="number" 
+              class="form-input" 
+              placeholder="Your age"
+              [(ngModel)]="registerData.age"
+              name="age">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-select" [(ngModel)]="registerData.gender" name="gender">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input 
+            type="tel" 
+            class="form-input" 
+            placeholder="+1234567890"
+            [(ngModel)]="registerData.phone"
+            name="phone">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="City, State"
+            [(ngModel)]="registerData.location"
+            name="location">
+        </div>
+      }
+
+      <!-- Doctor specific fields -->
+      @if (registerData.role === 'DOCTOR') {
+        <div class="form-group">
+          <label class="form-label">Hospital Name</label>
+          <select 
+            class="form-input" 
+            [(ngModel)]="registerData.hospitalName"
+            name="hospitalName"
+            required
+            (focus)="loadHospitals()">
+            <option value="" disabled>Select a hospital</option>
+            @for (hospital of hospitals(); track hospital) {
+              <option [value]="hospital">{{ hospital }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Licence Number</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="Medical licence number"
+            [(ngModel)]="registerData.licenceNumber"
+            name="licenceNumber"
+            required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Qualification</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="e.g., MBBS, MD"
+            [(ngModel)]="registerData.qualification"
+            name="qualification">
+        </div>
+        <div class="grid grid-cols-2 gap-md">
+          <div class="form-group">
+            <label class="form-label">Experience (years)</label>
+            <input 
+              type="number" 
+              class="form-input" 
+              placeholder="Years"
+              [(ngModel)]="registerData.experience"
+              name="experience">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="City"
+              [(ngModel)]="registerData.location"
+              name="doctorLocation">
+          </div>
+        </div>
+      }
+
+      <!-- Hospital specific fields -->
+      @if (registerData.role === 'HOSPITAL') {
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <textarea 
+            class="form-input" 
+            placeholder="Full hospital address"
+            [(ngModel)]="registerData.address"
+            name="address"
+            rows="2"
+            required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input 
+            type="tel" 
+            class="form-input" 
+            placeholder="+1-555-0100"
+            [(ngModel)]="registerData.contact"
+            name="contact"
+            required>
+        </div>
+      }
+      
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-input" 
+          placeholder="Create a password"
+          [(ngModel)]="registerData.password"
+          name="password"
+          (ngModelChange)="onPasswordChange()"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input 
+          type="password" 
+          class="form-input" 
+          [class.border-error]="showPasswordMismatch()"
+          placeholder="Confirm your password"
+          [(ngModel)]="registerData.confirmPassword"
+          name="confirmPassword"
+          (ngModelChange)="onPasswordChange()"
+          required>
+        @if (showPasswordMismatch()) {
+          <div class="form-error">Passwords do not match</div>
+        }
+      </div>
+      
+      <div class="mb-lg">
+        <label class="flex items-start gap-xs cursor-pointer">
+          <input 
+            type="checkbox" 
+            style="margin-top: 4px;"
+            [(ngModel)]="registerData.agreeToTerms"
+            name="agreeToTerms"
+            required>
+          <span class="text-sm text-secondary">I agree to the Terms of Service and Privacy Policy</span>
+        </label>
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-block mb-md" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span>Creating Account...</span>
+        } @else {
+          <span>Create Account</span>
+        }
+      </button>
+      
+      <div class="text-center text-secondary">
+        Already have an account? 
+        <a (click)="onSwitchToLogin()" class="text-dark cursor-pointer font-medium">Sign In</a>
+      </div>
+    </form>
+  </div>
+</div>

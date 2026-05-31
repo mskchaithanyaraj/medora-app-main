@@ -1,0 +1,154 @@
+<div class="prescriptions-page">
+  <div class="page-header">
+    <h2 class="page-title">
+      @if (selectedPatientId()) {
+        <button class="back-btn" (click)="backToPatients()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        Prescriptions - {{ selectedPatientName() }}
+      } @else {
+        Prescriptions
+      }
+    </h2>
+    @if (!selectedPatientId() && patients().length > 0) {
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search by patient name..." [value]="patientSearchQuery()" (input)="onPatientSearch($event)" class="search-input">
+      </div>
+    }
+    @if (selectedPatientId() && prescriptions().length > 0) {
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search by diagnosis..." [value]="prescriptionSearchQuery()" (input)="onPrescriptionSearch($event)" class="search-input">
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  } @else if (!selectedPatientId()) {
+    <!-- Patient List -->
+    @if (patients().length === 0) {
+      <div class="empty-state">
+        <h3>No Patients</h3>
+        <p>No patients found from your appointments.</p>
+      </div>
+    } @else {
+      <p class="section-subtitle">Select a patient to view their prescriptions</p>
+      <div class="patients-list">
+        @for (patient of filteredPatients(); track patient.id) {
+          <div class="patient-card" (click)="selectPatient(patient)">
+            <div class="patient-avatar">{{ patient.name.charAt(0) }}</div>
+            <span class="patient-name">{{ patient.name }}</span>
+            <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <!-- Prescriptions List -->
+    @if (prescriptions().length === 0) {
+      <div class="empty-state">
+        <h3>No Prescriptions</h3>
+        <p>No prescriptions found for this patient.</p>
+        
+      </div>
+    } @else {
+      <div class="prescriptions-list">
+        @for (prescription of filteredPrescriptions(); track prescription.id) {
+          <div class="prescription-card" (click)="viewPrescription(prescription)">
+            <div class="prescription-header">
+              <div class="prescription-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <div class="prescription-info">
+                <h3>{{ formatDate(prescription.appointment.appointmentDate) }}</h3>
+                <p class="date">{{ prescription.createdAt ? formatDate(prescription.createdAt) : '' }}</p>
+              </div>
+              <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+            <div class="prescription-preview">
+              <p class="diagnosis-label">Diagnosis:</p>
+              <p class="diagnosis-text">{{ prescription.diagnosis }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Prescription Detail Modal -->
+  @if (selectedPrescription()) {
+    <div class="modal-overlay" (click)="closePrescriptionModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Prescription Details</h2>
+          <button class="close-btn" (click)="closePrescriptionModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="prescription-meta">
+            <div class="meta-item">
+              <span class="meta-label">Patient</span>
+              <span class="meta-value">{{ selectedPrescription()!.appointment.patient.name }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Date</span>
+              <span class="meta-value">{{ formatDate(selectedPrescription()!.appointment.appointmentDate) }}</span>
+            </div>
+          </div>
+
+          @if (!isEditing()) {
+            <div class="prescription-section">
+              <h3>Diagnosis</h3>
+              <p>{{ selectedPrescription()!.diagnosis }}</p>
+            </div>
+
+            <div class="prescription-section">
+              <h3>Prescribed Medicine</h3>
+              <div class="medicine-content">{{ selectedPrescription()!.medicine }}</div>
+            </div>
+
+            <div class="modal-actions">
+              @if (canEdit(selectedPrescription()!)) {
+                <button class="btn btn-primary" (click)="startEditing()">Edit Prescription</button>
+              }
+            </div>
+          } @else {
+            <div class="edit-form">
+              <div class="form-group">
+                <label>Diagnosis</label>
+                <textarea [(ngModel)]="editDiagnosis" rows="3" class="form-control"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Medicine</label>
+                <textarea [(ngModel)]="editMedicine" rows="5" class="form-control"></textarea>
+              </div>
+              <div class="modal-actions">
+                <button class="btn btn-outline" (click)="cancelEditing()">Cancel</button>
+                <button class="btn btn-primary" (click)="saveEdit()">Save Changes</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,184 @@
+<div class="doctors-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Manage Doctors</h1>
+      <p class="subtitle">View and manage doctors registered under your hospital</p>
+    </div>
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by name or qualification..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="filter-tabs">
+    @for (status of statusOptions; track status) {
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedStatus() === status"
+        (click)="filterByStatus(status)">
+        {{ status === 'ALL' ? 'All Doctors' : status }}
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading doctors...</p>
+    </div>
+  }
+
+  <!-- Doctors List -->
+  @if (!loading() && filteredDoctors().length === 0) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
+      <h3>No Doctors Found</h3>
+      <p>No doctors match the selected filter.</p>
+    </div>
+  }
+
+  @if (!loading() && filteredDoctors().length > 0) {
+    <div class="doctors-grid">
+      @for (doctor of filteredDoctors(); track doctor.id) {
+        <div class="doctor-card" (click)="viewDetails(doctor)">
+          <div class="doctor-header">
+            <div class="doctor-avatar">
+              {{ doctor.name.charAt(0) || 'D' }}
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. {{ doctor.name }}</h3>
+              <p class="qualification">{{ doctor.qualification }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(doctor.authStatus || '')">
+              {{ doctor.authStatus }}
+            </span>
+          </div>
+
+          <div class="doctor-details">
+            <div class="detail-row">
+              <span class="label">License Number:</span>
+              <span class="value">{{ doctor.licenceNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Experience:</span>
+              <span class="value">{{ doctor.experience }} years</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Location:</span>
+              <span 
+            class="value">{{ doctor.location }}</span>
+            </div>
+
+            @if (doctor.rejectionReason) {
+              <div class="detail-row rejection">
+                <span class="label">Reason:</span>
+                <span class="value">{{ doctor.rejectionReason }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-view">View Details →</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Doctor Details Modal -->
+@if (showModal() && selectedDoctor(); as doctor) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Doctor Details</h2>
+        <button class="close-btn" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="doctor-header-detail">
+          <div class="doctor-avatar-large">
+            {{ doctor.name.charAt(0) }}
+          </div>
+          <div>
+            <h3>Dr. {{ doctor.name }}</h3>
+            <p class="modal-qualification">{{ doctor.qualification }}</p>
+            <span class="status-badge" [ngClass]="getStatusClass(doctor.authStatus || '')">
+              {{ doctor.authStatus }}
+            </span>
+            <span class="created-at">Registered On: {{ doctor.user.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="label">Doctor ID</span>
+            <span class="value">#{{ doctor.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">License Number</span>
+            <span class="value">{{ doctor.licenceNumber || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Experience</span>
+            <span class="value">{{ doctor.experience }} years</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Location</span>
+            <span class="value">{{ doctor.location || 'N/A' }}</span>
+          </div>
+          @if (doctor.updatedAt) {
+            <div class="detail-item">
+              <span class="label">Last Updated</span>
+              <span class="value">{{ doctor.updatedAt | date:'medium' }}</span>
+            </div>
+          }
+          @if (doctor.rejectionReason) {
+            <div class="detail-item full-width rejection">
+              <span class="label">Rejection Reason</span>
+              <span class="value">{{ doctor.rejectionReason }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Reason Input for actions -->
+        @if (showReasonInput) {
+          <div class="reason-input">
+            <label>Please provide a reason for this action:</label>
+            <textarea [(ngModel)]="rejectionReason" placeholder="Enter reason..." rows="3"></textarea>
+            <div class="reason-actions">
+              <button class="btn btn-cancel" (click)="showReasonInput = false; pendingAction = ''">Cancel</button>
+              <button class="btn btn-confirm" (click)="confirmAction(doctor)">Confirm</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (!showReasonInput) {
+        <div class="modal-footer">
+          @switch (doctor.authStatus) {
+            @case ('PENDING') {
+              <button class="btn btn-reject" (click)="requestReason('reject')">Reject</button>
+              <button class="btn btn-approve" (click)="approveDoctor(doctor)">Approve</button>
+            }
+            @case ('APPROVED') {
+              <button class="btn btn-suspend" (click)="requestReason('suspend')">Suspend</button>
+              <button class="btn btn-fraud" (click)="requestReason('fraud')">Mark as Fraud</button>
+            }
+            @case ('REJECTED') {
+              <button class="btn btn-approve" (click)="approveDoctor(doctor)">Approve</button>
+            }
+            @case ('SUSPENDED') {
+              <button class="btn btn-approve" (click)="approveDoctor(doctor)">Reactivate</button>
+              <button class="btn btn-fraud" (click)="requestReason('fraud')">Mark as Fraud</button>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,109 @@
+<div class="prescriptions-page">
+  <div class="page-header">
+    <h2 class="page-title">My Prescriptions</h2>
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by doctor or diagnosis..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading prescriptions...</p>
+    </div>
+  } @else if (prescriptions().length === 0) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+      <h3>No Prescriptions Yet</h3>
+      <p>You don't have any prescriptions. They will appear here after your doctor consultations.</p>
+    </div>
+  } @else {
+    <!-- Prescriptions List -->
+    <div class="prescriptions-list">
+      @for (prescription of filteredPrescriptions(); track prescription.id) {
+        <div class="prescription-card" (click)="viewPrescription(prescription)">
+          <div class="prescription-header">
+            <div class="prescription-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="prescription-info">
+              <h3>Dr. {{ prescription.appointment.doctor.name }}</h3>
+              <p class="date">{{ formatDate(prescription.appointment.appointmentDate) }}</p>
+            </div>
+            <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+          <div class="prescription-preview">
+            <p class="diagnosis-label">Diagnosis:</p>
+            <p class="diagnosis-text">{{ prescription.diagnosis }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Prescription Detail Modal -->
+  @if (selectedPrescription()) {
+    <div class="modal-overlay" (click)="closePrescriptionModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Prescription Details</h2>
+          <button class="close-btn" (click)="closePrescriptionModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="prescription-meta">
+            <div class="meta-item">
+              <span class="meta-label">Doctor</span>
+              <span class="meta-value">Dr. {{ selectedPrescription()!.appointment.doctor.name }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Date</span>
+              <span class="meta-value">{{ formatDate(selectedPrescription()!.appointment.appointmentDate) }}</span>
+            </div>
+          </div>
+
+          <div class="prescription-section">
+            <h3>Diagnosis</h3>
+            <p>{{ selectedPrescription()!.diagnosis }}</p>
+          </div>
+
+          <div class="prescription-section">
+            <h3>Prescribed Medicine</h3>
+            <div class="medicine-content">
+              {{ selectedPrescription()!.medicine }}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-download" (click)="downloadPrescriptionPdf()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

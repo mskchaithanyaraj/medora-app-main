@@ -1,0 +1,99 @@
+<div class="appointments-page">
+  <div class="page-header">
+    <h2 class="page-title">My Appointments</h2>
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by patient or date..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    @for (filter of filters; track filter.value) {
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter() === filter.value"
+        (click)="setFilter(filter.value)">
+        {{ filter.label }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading appointments...</p>
+    </div>
+  } @else if (filteredAppointments.length === 0) {
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <h3>No Appointments</h3>
+      <p>No {{ selectedFilter() === 'ALL' ? '' : selectedFilter().toLowerCase() }} appointments found.</p>
+    </div>
+  } @else {
+    <!-- Appointments List -->
+    <div class="appointments-list">
+      @for (appointment of filteredAppointments; track appointment.id) {
+        <div class="appointment-card">
+          <div class="appointment-header">
+            <div class="patient-info">
+              <div class="patient-avatar">
+                {{ appointment.patient.name.charAt(0) }}
+              </div>
+              <div>
+                <h3 class="patient-name">{{ appointment.patient.name }}</h3>
+                <p class="appointment-reason">{{ appointment.problem }}</p>
+              </div>
+            </div>
+            <span class="badge" [class]="getStatusClass(appointment.bookingStatus)">
+              {{ appointment.bookingStatus }}
+            </span>
+          </div>
+
+          <div class="appointment-details">
+            <div class="detail-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>{{ formatDate(appointment.appointmentDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>{{ getSlotLabel(appointment.slotType) }}</span>
+            </div>
+          </div>
+
+          <div class="appointment-actions">
+            @if (appointment.bookingStatus === 'COMPLETED' || appointment.bookingStatus === 'BOOKED') {
+              @if (hasPrescription(appointment.id)) {
+                <a [routerLink]="['/doctor/prescriptions']" [queryParams]="{patientId: appointment.patient.id, prescriptionId: prescriptionMap.get(appointment.id)}" class="btn btn-success btn-sm">
+                  See Prescription
+                </a>
+              } @else {
+                <a [routerLink]="['/doctor/prescriptions/create', appointment.id]" class="btn btn-primary btn-sm">
+                  Write Prescription
+                </a>
+              }
+            }
+            <a [routerLink]="['/doctor/prescriptions']" [queryParams]="{patientId: appointment.patient.id}" class="btn btn-outline btn-sm">
+              Patient History
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

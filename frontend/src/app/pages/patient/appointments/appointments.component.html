@@ -1,0 +1,111 @@
+<div class="appointments-page">
+  <div class="page-header">
+    <h2 class="page-title">My Appointments</h2>
+    <div class="header-right">
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search by doctor or date..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+      </div>
+      <a routerLink="/patient/book" class="btn btn-primary" style="color: white;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="16"></line>
+        <line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+      Book New
+    </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    @for (filter of filters; track filter.value) {
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter() === filter.value"
+        (click)="setFilter(filter.value)">
+        {{ filter.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading appointments...</p>
+    </div>
+  } @else if (filteredAppointments.length === 0) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <h3>No Appointments Found</h3>
+      <p>You don't have any {{ selectedFilter() === 'ALL' ? '' : selectedFilter().toLowerCase() }} appointments yet.</p>
+      <a routerLink="/patient/book" class="btn btn-primary" style="color: white;">Book Your First Appointment</a>
+    </div>
+  } @else {
+    <!-- Appointments List -->
+    <div class="appointments-list">
+      @for (appointment of filteredAppointments; track appointment.id) {
+        <div class="appointment-card">
+          <div class="appointment-header">
+            <div class="doctor-info">
+              <div class="doctor-avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <div>
+                <h3 class="doctor-name">Dr. {{ appointment.doctor.name }}</h3>
+                <p class="appointment-reason">{{ appointment.problem }}</p>
+              </div>
+            </div>
+            <span class="badge" [class]="getStatusClass(appointment.bookingStatus)">
+              {{ appointment.bookingStatus }}
+            </span>
+          </div>
+
+          <div class="appointment-details">
+            <div class="detail-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>{{ formatDate(appointment.appointmentDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>{{ getSlotLabel(appointment.slotType) }}</span>
+            </div>
+          </div>
+
+          @if (appointment.bookingStatus === 'BOOKED' || hasPrescription(appointment.id)) {
+            <div class="appointment-actions">
+              @if (hasPrescription(appointment.id)) {
+                <a routerLink="/patient/prescriptions" [queryParams]="{prescriptionId: prescriptionMap.get(appointment.id)}" class="btn btn-success btn-sm">
+                  See Prescription
+                </a>
+              }
+              @if (appointment.bookingStatus === 'BOOKED') {
+                <button class="btn btn-outline btn-sm" (click)="cancelAppointment(appointment)">
+                  Cancel Appointment
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

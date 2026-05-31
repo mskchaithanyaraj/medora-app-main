@@ -1,0 +1,286 @@
+<!-- Navigation Bar -->
+<nav class="bg-primary shadow-md sticky" style="top: 0; z-index: 100;">
+  <div class="container flex items-center justify-between p-lg">
+    <div class="flex items-center gap-md">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-dark"><path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/></svg>
+      <h1 class="text-2xl font-bold text-dark">Medora</h1>
+    </div>
+    
+    <div class="flex items-center gap-lg hide-mobile">
+      <a (click)="scrollToSection('features')" class="text-secondary cursor-pointer transition">Features</a>
+      <a (click)="scrollToSection('how-it-works')" class="text-secondary cursor-pointer transition">How It Works</a>
+      <a (click)="scrollToSection('testimonials')" class="text-secondary cursor-pointer transition">Testimonials</a>
+      <a (click)="scrollToSection('contact')" class="text-secondary cursor-pointer transition">Contact</a>
+    </div>
+
+    <div class="flex items-center gap-md">
+      <button (click)="toggleTheme()" class="btn btn-ghost btn-sm">
+        @if (isDarkMode()) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        }
+      </button>
+      <button (click)="openLoginModal()" class="btn btn-outline btn-sm">Login</button>
+      <button (click)="openRegisterModal()" class="btn btn-primary btn-sm">Get Started</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="bg-light" style="padding: 80px 0;">
+  <div class="container">
+    <div class="flex items-center justify-between flex-wrap gap-xl">
+      <div style="flex: 1; min-width: 300px;">
+        <h2 class="text-4xl font-bold text-dark mb-lg">
+          Your Health, <span class="text-muted">Our Priority</span>
+        </h2>
+        <p class="text-lg text-secondary mb-xl" style="line-height: 1.8;">
+          Medora connects patients with trusted hospitals and qualified doctors. 
+          Book appointments, manage prescriptions, and take control of your healthcare journey - all in one place.
+        </p>
+        <div class="flex gap-md flex-wrap">
+          <button (click)="openRegisterModal()" class="btn btn-primary btn-lg">
+            Join Medora Today
+          </button>
+          <button (click)="scrollToSection('how-it-works')" class="btn btn-outline btn-lg">
+            Learn More
+          </button>
+        </div>
+        
+        <!-- Stats -->
+        <div class="flex gap-xl mt-xl flex-wrap">
+          @for (stat of stats; track stat.label) {
+            <div>
+              <div class="text-3xl font-bold text-dark">{{ stat.value }}</div>
+              <div class="text-sm text-muted">{{ stat.label }}</div>
+            </div>
+          }
+        </div>
+      </div>
+      
+      <div style="flex: 1; min-width: 300px;" class="hide-mobile">
+        <div class="card card-elevated bg-accent p-xl text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 20px auto;"><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z"/></svg>
+          <h3 class="text-xl font-semibold text-dark mb-sm">Healthcare Made Simple</h3>
+          <p class="text-secondary">Connect with the best medical professionals</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="bg-primary" style="padding: 80px 0;">
+  <div class="container">
+    <div class="text-center mb-2xl">
+      <h2 class="text-3xl font-bold text-dark mb-md">Why Choose Medora?</h2>
+      <p class="text-lg text-secondary">Everything you need for your healthcare management</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      @for (feature of features; track feature.title) {
+        <div class="card card-accent transition cursor-pointer" style="height: 100%;">
+          <div class="feature-icon mb-md">
+            @switch (feature.icon) {
+              @case ('hospital') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/></svg>
+              }
+              @case ('stethoscope') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+              }
+              @case ('calendar') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              }
+              @case ('pill') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+              }
+              @case ('star') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              }
+              @case ('shield-check') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+              }
+            }
+          </div>
+          <h3 class="text-xl font-semibold text-dark mb-sm">{{ feature.title }}</h3>
+          <p class="text-secondary">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="bg-secondary" style="padding: 80px 0;">
+  <div class="container">
+    <div class="text-center mb-2xl">
+      <h2 class="text-3xl font-bold text-dark mb-md">How Medora Works</h2>
+      <p class="text-lg text-secondary">Get started in three simple steps</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px;">
+      <div class="text-center">
+        <div class="bg-dark text-inverse" 
+             style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 24px;">
+          1
+        </div>
+        <h3 class="text-xl font-semibold text-dark mb-md">Create Your Account</h3>
+        <p class="text-secondary">Sign up as a patient, doctor, or hospital. It takes less than 2 minutes!</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="bg-dark text-inverse" 
+             style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 24px;">
+          2
+        </div>
+        <h3 class="text-xl font-semibold text-dark mb-md">Find & Connect</h3>
+        <p class="text-secondary">Search for doctors by specialization, location, or hospital. View profiles and ratings.</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="bg-dark text-inverse" 
+             style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 24px;">
+          3
+        </div>
+        <h3 class="text-xl font-semibold text-dark mb-md">Book & Manage</h3>
+        <p class="text-secondary">Book appointments, receive prescriptions, and manage your healthcare all in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="bg-light" style="padding: 80px 0;">
+  <div class="container">
+    <div class="text-center mb-2xl">
+      <h2 class="text-3xl font-bold text-dark mb-md">What Our Users Say</h2>
+      <p class="text-lg text-secondary">Trusted by thousands of patients and healthcare providers</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      @for (testimonial of testimonials; track testimonial.name) {
+        <div class="card card-elevated">
+          <div class="flex items-center gap-md mb-md">
+            <div class="avatar-circle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="font-semibold text-dark">{{ testimonial.name }}</div>
+              <div class="text-sm text-muted">{{ testimonial.role }}</div>
+            </div>
+          </div>
+          <div class="mb-md flex gap-xs">
+            @for (star of [1,2,3,4,5]; track star) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="var(--color-warning)" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            }
+          </div>
+          <p class="text-secondary" style="font-style: italic;">"{{ testimonial.comment }}"</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-dark text-white" style="padding: 80px 0;">
+  <div class="container text-center">
+    <h2 class="text-3xl font-bold mb-md">Ready to Transform Your Healthcare Experience?</h2>
+    <p class="text-lg mb-xl" style="opacity: 0.9;">Join thousands of satisfied users who trust Medora for their healthcare needs.</p>
+    <div class="flex gap-md justify-center flex-wrap">
+      <button (click)="openRegisterModal()" class="btn btn-primary btn-lg">
+        Create Free Account
+      </button>
+      <button (click)="openLoginModal()" class="btn btn-ghost btn-lg" style="color: white; border-color: white;">
+        Sign In
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="bg-primary" style="padding: 60px 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px;">
+      <div>
+        <h3 class="text-xl font-bold text-dark mb-md flex items-center gap-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-dark"><path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/></svg>
+          Medora
+        </h3>
+        <p class="text-secondary mb-md">Connecting patients with quality healthcare providers since 2026.</p>
+        <div class="flex gap-sm">
+          <div class="social-icon bg-dark text-inverse p-sm rounded cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <div class="social-icon bg-dark text-inverse p-sm rounded cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+          </div>
+          <div class="social-icon bg-dark text-inverse p-sm rounded cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+          </div>
+          <div class="social-icon bg-dark text-inverse p-sm rounded cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold text-dark mb-md">Quick Links</h4>
+        <div class="flex flex-col gap-sm">
+          <a (click)="scrollToSection('features')" class="text-secondary cursor-pointer">Features</a>
+          <a (click)="scrollToSection('how-it-works')" class="text-secondary cursor-pointer">How It Works</a>
+          <a (click)="scrollToSection('testimonials')" class="text-secondary cursor-pointer">Testimonials</a>
+          <a class="text-secondary cursor-pointer">Privacy Policy</a>
+        </div>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold text-dark mb-md">For Users</h4>
+        <div class="flex flex-col gap-sm">
+          <a (click)="openRegisterModal()" class="text-secondary cursor-pointer">Register as Patient</a>
+          <a (click)="openRegisterModal()" class="text-secondary cursor-pointer">Register as Doctor</a>
+          <a (click)="openRegisterModal()" class="text-secondary cursor-pointer">Register as Hospital</a>
+          <a class="text-secondary cursor-pointer">FAQ</a>
+        </div>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold text-dark mb-md">Contact Us</h4>
+        <div class="flex flex-col gap-sm text-secondary">
+          <div class="flex items-center gap-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            support&#64;medora.health
+          </div>
+          <div class="flex items-center gap-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +1 (555) 123-4567
+          </div>
+          <div class="flex items-center gap-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Boston, MA 02115
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t mt-xl pt-lg text-center text-muted">
+      <p>&copy; 2026 Medora. All rights reserved. Built with care for better healthcare.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Login Modal -->
+@if (showLoginModal()) {
+  <app-login 
+    (closeModal)="closeModals()" 
+    (switchToRegister)="openRegisterModal()">
+  </app-login>
+}
+
+<!-- Register Modal -->
+@if (showRegisterModal()) {
+  <app-register 
+    (closeModal)="closeModals()" 
+    (switchToLogin)="openLoginModal()">
+  </app-register>
+}

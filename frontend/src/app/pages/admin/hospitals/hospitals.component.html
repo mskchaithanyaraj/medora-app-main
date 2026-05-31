@@ -1,0 +1,170 @@
+<div class="hospitals-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Manage Hospitals</h1>
+      <p class="subtitle">View and manage all registered hospitals</p>
+    </div>
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by hospital name..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="filter-tabs">
+    @for (status of statusOptions; track status) {
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedStatus() === status"
+        (click)="filterByStatus(status)">
+        {{ status === 'ALL' ? 'All Hospitals' : status }}
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading hospitals...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && filteredHospitals().length === 0) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <h3>No Hospitals Found</h3>
+      <p>No hospitals match the selected filter.</p>
+    </div>
+  }
+
+  <!-- Hospitals List -->
+  @if (!loading() && filteredHospitals().length > 0) {
+    <div class="hospitals-grid">
+      @for (hospital of filteredHospitals(); track hospital.id) {
+        <div class="hospital-card" (click)="viewDetails(hospital)">
+          <div class="card-header">
+            <div class="hospital-avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+            </div>
+            <div class="hospital-info">
+              <h3>{{ hospital.name }}</h3>
+              <p class="username">&#64;{{ hospital.user.username }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(hospital.authStatus || '')">
+              {{ hospital.authStatus }}
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="detail-row">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="value">{{ hospital.address || 'Not specified' }}</span>
+            </div>
+            <div class="detail-row">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span class="value">{{ hospital.contact || 'Not specified' }}</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn-view">View Details</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Hospital Details Modal -->
+@if (showModal() && selectedHospital(); as hospital) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Hospital Details</h2>
+        <button class="close-btn" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="hospital-header-detail">
+          <div class="hospital-avatar-large">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          </div>
+          <div>
+            <h3>{{ hospital.name }}</h3>
+            <span class="status-badge" [ngClass]="getStatusClass(hospital.authStatus || '')">
+              {{ hospital.authStatus }}
+            </span>
+            <span class="created-at">Registered On: {{ hospital.user.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="label">Hospital ID</span>
+            <span class="value">#{{ hospital.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Username</span>
+            <span class="value">&#64;{{ hospital.user.username }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Address</span>
+            <span class="value">{{ hospital.address || 'Not specified' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Contact</span>
+            <span class="value">{{ hospital.contact || 'Not specified' }}</span>
+          </div>
+          @if (hospital.updatedAt) {
+          <div class="detail-item">
+            <span class="label">Last Updated</span>
+            <span class="value">{{ hospital.updatedAt | date:'medium' }}</span>
+          </div>
+          }
+          @if (hospital.rejectionReason) {
+            <div class="detail-item full-width rejection">
+              <span class="label">Rejection Reason</span>
+              <span class="value">{{ hospital.rejectionReason }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Reason Input -->
+        @if (showReasonInput) {
+          <div class="reason-input">
+            <label>Reason for {{ pendingAction }} (required)</label>
+            <textarea [(ngModel)]="rejectionReason" placeholder="Enter reason..." rows="3"></textarea>
+            <div class="reason-actions">
+              <button class="btn btn-cancel" (click)="showReasonInput = false; pendingAction = ''; rejectionReason = ''">Cancel</button>
+              <button class="btn btn-confirm" (click)="confirmAction(hospital)">Confirm</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        @if (!showReasonInput) {
+          @switch (hospital.authStatus) {
+            @case ('PENDING') {
+              <button class="btn btn-reject" (click)="requestReason('reject')">Reject</button>
+              <button class="btn btn-approve" (click)="approveHospital(hospital)">Approve</button>
+            }
+            @case ('APPROVED') {
+              <button class="btn btn-suspend" (click)="requestReason('suspend')">Suspend</button>
+              <button class="btn btn-fraud" (click)="requestReason('fraud')">Flag as Fraud</button>
+            }
+            @case ('REJECTED') {
+              <button class="btn btn-approve" (click)="approveHospital(hospital)">Approve</button>
+            }
+            @case ('SUSPENDED') {
+              <button class="btn btn-approve" (click)="approveHospital(hospital)">Reactivate</button>
+              <button class="btn btn-fraud" (click)="requestReason('fraud')">Flag as Fraud</button>
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

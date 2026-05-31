@@ -1,0 +1,96 @@
+############################
+# 🔹 Node / Angular
+############################
+node_modules/
+dist/
+build/
+.tmp/
+.temp/
+.cache/
+.angular/
+out-tsc/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+############################
+# 🔹 Environment Files
+############################
+.env
+.env.*
+*.env
+*.local
+
+############################
+# 🔹 Java / Spring Boot
+############################
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+.gradle/
+build/
+
+############################
+# 🔹 IDE Files
+############################
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ / IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+############################
+# 🔹 OS Files
+############################
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+############################
+# 🔹 Logs & Temp
+############################
+logs/
+*.log
+*.tmp
+*.swp
+
+############################
+# 🔹 Coverage & Test
+############################
+coverage/
+.nyc_output/
+
+############################
+# 🔹 Misc
+############################
+*.pid
+*.seed
+*.lock

@@ -1,0 +1,159 @@
+<div class="doctors-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h1>All Doctors</h1>
+      <p class="subtitle">View all registered doctors in the system</p>
+    </div>
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by name, qualification, or hospital..." [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="filter-tabs">
+    @for (status of statusOptions; track status) {
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus() === status"
+        (click)="filterByStatus(status)">
+        {{ status === 'ALL' ? 'All Doctors' : status }}
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading doctors...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && filteredDoctors().length === 0 && !loading()) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
+      <h3>No Doctors Found</h3>
+      <p>No doctors have registered in the system yet.</p>
+    </div>
+  }
+
+  <!-- Doctors Table -->
+  @if (!loading() && filteredDoctors().length > 0) {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Doctor</th>
+            <th>Hospital</th>
+            <th>Qualification</th>
+            <th>Experience</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doctor of filteredDoctors(); track doctor.id) {
+            <tr>
+              <td>
+                <div class="doctor-cell">
+                  <div class="avatar">{{ doctor.name.charAt(0) || 'D' }}</div>
+                  <div>
+                    <div class="name">Dr. {{ doctor.name }}</div>
+                    <div class="username">&#64;{{ doctor.user.username }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ doctor.hospital.name || 'N/A' }}</td>
+              <td>{{ doctor.qualification }}</td>
+              <td>{{ doctor.experience }} yrs</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(doctor.authStatus || '')">
+                  {{ doctor.authStatus }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-action" (click)="viewDetails(doctor)">View</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Doctor Details Modal -->
+@if (showModal() && selectedDoctor(); as doctor) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Doctor Details</h2>
+        <button class="close-btn" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="doctor-header-detail">
+          <div class="doctor-avatar-large">{{ doctor.name.charAt(0) || 'D' }}</div>
+          <div>
+            <h3>Dr. {{ doctor.name }}</h3>
+            <span class="status-badge" [ngClass]="getStatusClass(doctor.authStatus || '')">
+              {{ doctor.authStatus }}
+            </span>
+            <span class="created-at">Registered On: {{ doctor.user.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="label">Doctor ID</span>
+            <span class="value">#{{ doctor.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Username</span>
+            <span class="value">&#64;{{ doctor.user.username }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Hospital</span>
+            <span class="value">{{ doctor.hospital.name || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">License Number</span>
+            <span class="value">{{ doctor.licenceNumber }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Qualification</span>
+            <span class="value">{{ doctor.qualification }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Experience</span>
+            <span class="value">{{ doctor.experience }} years</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Location</span>
+            <span class="value">{{ doctor.location }}</span>
+          </div>
+          @if(doctor.updatedAt){
+          <div class="detail-item">
+            <span class="label">Last Updated</span>
+            <span class="value">{{ doctor.updatedAt | date:'medium' }}</span>
+          </div>
+          }
+          @if (doctor.rejectionReason) {
+            <div class="detail-item full-width rejection">
+              <span class="label">Rejection Reason</span>
+              <span class="value">{{ doctor.rejectionReason }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-close" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}
